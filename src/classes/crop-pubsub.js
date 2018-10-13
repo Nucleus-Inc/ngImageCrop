@@ -1,21 +1,24 @@
+'use strict';
+
 crop.factory('cropPubSub', [function() {
-  return () => {
-    let events = {}
+  return function() {
+    var events = {};
     // Subscribe
-    this.on = (names, handler) => {
-      names.split(' ').forEach((name) => {
-        if (!events[name])
-          events[name] = []
-        events[name].push(handler)
-      })
-      return this
-    }
+    this.on = function(names, handler) {
+      names.split(' ').forEach(function(name) {
+        if (!events[name]) {
+          events[name] = [];
+        }
+        events[name].push(handler);
+      });
+      return this;
+    };
     // Publish
-    this.trigger = (name, args) => {
-      angular.forEach(events[name], (handler) => {
-        handler.call(null, args)
-      })
-      return this
-    }
-  }
-}])
+    this.trigger = function(name, args) {
+      angular.forEach(events[name], function(handler) {
+        handler.call(null, args);
+      });
+      return this;
+    };
+  };
+}]);

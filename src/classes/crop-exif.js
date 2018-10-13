@@ -1,10 +1,13 @@
 /**
  * EXIF service is based on the exif-js library (https://github.com/jseidelin/exif-js)
  */
-crop.service('cropEXIF', [function() {
-  let debug = false
 
-  let ExifTags = this.Tags = {
+'use strict';
+
+crop.service('cropEXIF', [function() {
+  var debug = false;
+
+  var ExifTags = this.Tags = {
 
       // version tags
       0x9000 : "ExifVersion",             // EXIF version
@@ -78,9 +81,9 @@ crop.service('cropEXIF', [function() {
       // other tags
       0xA005 : "InteroperabilityIFDPointer",
       0xA420 : "ImageUniqueID"            // Identifier assigned uniquely to each image
-  }
+  };
 
-  let TiffTags = this.TiffTags = {
+  var TiffTags = this.TiffTags = {
       0x0100 : "ImageWidth",
       0x0101 : "ImageHeight",
       0x8769 : "ExifIFDPointer",
@@ -114,9 +117,9 @@ crop.service('cropEXIF', [function() {
       0x0131 : "Software",
       0x013B : "Artist",
       0x8298 : "Copyright"
-  }
+  };
 
-  let GPSTags = this.GPSTags = {
+  var GPSTags = this.GPSTags = {
       0x0000 : "GPSVersionID",
       0x0001 : "GPSLatitudeRef",
       0x0002 : "GPSLatitude",
@@ -148,9 +151,9 @@ crop.service('cropEXIF', [function() {
       0x001C : "GPSAreaInformation",
       0x001D : "GPSDateStamp",
       0x001E : "GPSDifferential"
-  }
+  };
 
-  let StringValues = this.StringValues = {
+  var StringValues = this.StringValues = {
       ExposureProgram : {
           0 : "Not defined",
           1 : "Manual",
@@ -286,96 +289,97 @@ crop.service('cropEXIF', [function() {
           5 : "G",
           6 : "B"
       }
-  }
+  };
 
   function addEvent(element, event, handler) {
       if (element.addEventListener) {
-          element.addEventListener(event, handler, false)
+          element.addEventListener(event, handler, false);
       } else if (element.attachEvent) {
-          element.attachEvent("on" + event, handler)
+          element.attachEvent("on" + event, handler);
       }
   }
 
   function imageHasData(img) {
-      return !!(img.exifdata)
+      return !!(img.exifdata);
   }
 
+
   function base64ToArrayBuffer(base64, contentType) {
-      contentType = contentType || base64.match(/^data\:([^\;]+)\;base64,/mi)[1] || '' // e.g. 'data:image/jpeg;base64,...' => 'image/jpeg'
-      base64 = base64.replace(/^data\:([^\;]+)\;base64,/gmi, '')
-      let binary = atob(base64)
-      let len = binary.length
-      let buffer = new ArrayBuffer(len)
-      let view = new Uint8Array(buffer)
-      for (let i = 0; i < len; i++) {
-          view[i] = binary.charCodeAt(i)
+      contentType = contentType || base64.match(/^data\:([^\;]+)\;base64,/mi)[1] || ''; // e.g. 'data:image/jpeg;base64,...' => 'image/jpeg'
+      base64 = base64.replace(/^data\:([^\;]+)\;base64,/gmi, '');
+      var binary = atob(base64);
+      var len = binary.length;
+      var buffer = new ArrayBuffer(len);
+      var view = new Uint8Array(buffer);
+      for (var i = 0; i < len; i++) {
+          view[i] = binary.charCodeAt(i);
       }
-      return buffer
+      return buffer;
   }
 
   function objectURLToBlob(url, callback) {
-      let http = new XMLHttpRequest()
-      http.open("GET", url, true)
-      http.responseType = "blob"
-      http.onload = (e) => {
+      var http = new XMLHttpRequest();
+      http.open("GET", url, true);
+      http.responseType = "blob";
+      http.onload = function(e) {
           if (this.status == 200 || this.status === 0) {
-              callback(this.response)
+              callback(this.response);
           }
       };
-      http.send()
+      http.send();
   }
 
   function getImageData(img, callback) {
       function handleBinaryFile(binFile) {
-          let data = findEXIFinJPEG(binFile)
-          let iptcdata = findIPTCinJPEG(binFile)
-          img.exifdata = data || {}
-          img.iptcdata = iptcdata || {}
+          var data = findEXIFinJPEG(binFile);
+          var iptcdata = findIPTCinJPEG(binFile);
+          img.exifdata = data || {};
+          img.iptcdata = iptcdata || {};
           if (callback) {
-              callback.call(img)
+              callback.call(img);
           }
       }
 
       if (img.src) {
           if (/^data\:/i.test(img.src)) { // Data URI
-              let arrayBuffer = base64ToArrayBuffer(img.src)
-              handleBinaryFile(arrayBuffer)
+              var arrayBuffer = base64ToArrayBuffer(img.src);
+              handleBinaryFile(arrayBuffer);
 
           } else if (/^blob\:/i.test(img.src)) { // Object URL
-              let fileReader = new FileReader()
-              fileReader.onload = (e) => {
-                  handleBinaryFile(e.target.result)
-              }
-              objectURLToBlob(img.src, (blob) => {
-                  fileReader.readAsArrayBuffer(blob)
-              })
+              var fileReader = new FileReader();
+              fileReader.onload = function(e) {
+                  handleBinaryFile(e.target.result);
+              };
+              objectURLToBlob(img.src, function (blob) {
+                  fileReader.readAsArrayBuffer(blob);
+              });
           } else {
-              let http = new XMLHttpRequest()
-              http.onload = () => {
+              var http = new XMLHttpRequest();
+              http.onload = function() {
                   if (this.status == 200 || this.status === 0) {
-                      handleBinaryFile(http.response)
+                      handleBinaryFile(http.response);
                   } else {
-                      throw "Could not load image"
+                      throw "Could not load image";
                   }
-                  http = null
-              }
-              http.open("GET", img.src, true)
-              http.responseType = "arraybuffer"
-              http.send(null)
+                  http = null;
+              };
+              http.open("GET", img.src, true);
+              http.responseType = "arraybuffer";
+              http.send(null);
           }
       } else if (window.FileReader && (img instanceof window.Blob || img instanceof window.File)) {
-          let fileReader = new FileReader()
-          fileReader.onload = (e) => {
-              if (debug) console.log("Got file of length " + e.target.result.byteLength)
-              handleBinaryFile(e.target.result)
-          }
+          var fileReader = new FileReader();
+          fileReader.onload = function(e) {
+              if (debug) console.log("Got file of length " + e.target.result.byteLength);
+              handleBinaryFile(e.target.result);
+          };
 
-          fileReader.readAsArrayBuffer(img)
+          fileReader.readAsArrayBuffer(img);
       }
   }
 
   function findEXIFinJPEG(file) {
-      let dataView = new DataView(file)
+      var dataView = new DataView(file);
 
       if (debug) console.log("Got file of length " + file.byteLength);
       if ((dataView.getUint8(0) != 0xFF) || (dataView.getUint8(1) != 0xD8)) {
@@ -383,7 +387,7 @@ crop.service('cropEXIF', [function() {
           return false; // not a valid jpeg
       }
 
-      let offset = 2,
+      var offset = 2,
           length = file.byteLength,
           marker;
 
@@ -415,7 +419,7 @@ crop.service('cropEXIF', [function() {
   }
 
   function findIPTCinJPEG(file) {
-      let dataView = new DataView(file);
+      var dataView = new DataView(file);
 
       if (debug) console.log("Got file of length " + file.byteLength);
       if ((dataView.getUint8(0) != 0xFF) || (dataView.getUint8(1) != 0xD8)) {
@@ -423,11 +427,11 @@ crop.service('cropEXIF', [function() {
           return false; // not a valid jpeg
       }
 
-      let offset = 2,
+      var offset = 2,
           length = file.byteLength;
 
 
-      let isFieldSegmentStart = function(dataView, offset){
+      var isFieldSegmentStart = function(dataView, offset){
           return (
               dataView.getUint8(offset) === 0x38 &&
               dataView.getUint8(offset+1) === 0x42 &&
@@ -443,7 +447,7 @@ crop.service('cropEXIF', [function() {
           if ( isFieldSegmentStart(dataView, offset )){
 
               // Get the length of the name header (which is padded to an even number of bytes)
-              let nameHeaderLength = dataView.getUint8(offset+7);
+              var nameHeaderLength = dataView.getUint8(offset+7);
               if(nameHeaderLength % 2 !== 0) nameHeaderLength += 1;
               // Check for pre photoshop 6 format
               if(nameHeaderLength === 0) {
@@ -451,8 +455,8 @@ crop.service('cropEXIF', [function() {
                   nameHeaderLength = 4;
               }
 
-              let startOffset = offset + 8 + nameHeaderLength;
-              let sectionLength = dataView.getUint16(offset + 6 + nameHeaderLength);
+              var startOffset = offset + 8 + nameHeaderLength;
+              var sectionLength = dataView.getUint16(offset + 6 + nameHeaderLength);
 
               return readIPTCData(file, startOffset, sectionLength);
 
@@ -467,7 +471,7 @@ crop.service('cropEXIF', [function() {
       }
 
   }
-  let IptcFieldMap = {
+  var IptcFieldMap = {
       0x78 : 'caption',
       0x6E : 'credit',
       0x19 : 'keywords',
@@ -480,10 +484,10 @@ crop.service('cropEXIF', [function() {
       0x0F : 'category'
   };
   function readIPTCData(file, startOffset, sectionLength){
-      let dataView = new DataView(file);
-      let data = {};
-      let fieldValue, fieldName, dataSize, segmentType, segmentSize;
-      let segmentStartPos = startOffset;
+      var dataView = new DataView(file);
+      var data = {};
+      var fieldValue, fieldName, dataSize, segmentType, segmentSize;
+      var segmentStartPos = startOffset;
       while(segmentStartPos < startOffset+sectionLength) {
           if(dataView.getUint8(segmentStartPos) === 0x1C && dataView.getUint8(segmentStartPos+1) === 0x02){
               segmentType = dataView.getUint8(segmentStartPos+2);
@@ -516,7 +520,7 @@ crop.service('cropEXIF', [function() {
 
 
   function readTags(file, tiffStart, dirStart, strings, bigEnd) {
-      let entries = file.getUint16(dirStart, !bigEnd),
+      var entries = file.getUint16(dirStart, !bigEnd),
           tags = {},
           entryOffset, tag,
           i;
@@ -532,7 +536,7 @@ crop.service('cropEXIF', [function() {
 
 
   function readTagValue(file, entryOffset, tiffStart, dirStart, bigEnd) {
-      let type = file.getUint16(entryOffset+2, !bigEnd),
+      var type = file.getUint16(entryOffset+2, !bigEnd),
           numValues = file.getUint32(entryOffset+4, !bigEnd),
           valueOffset = file.getUint32(entryOffset+8, !bigEnd) + tiffStart,
           offset,
@@ -625,8 +629,8 @@ crop.service('cropEXIF', [function() {
   }
 
   function getStringFromDB(buffer, start, length) {
-      let outstr = "";
-      for (let n = start; n < start+length; n++) {
+      var outstr = "";
+      for (var n = start; n < start+length; n++) {
           outstr += String.fromCharCode(buffer.getUint8(n));
       }
       return outstr;
@@ -638,7 +642,7 @@ crop.service('cropEXIF', [function() {
           return false;
       }
 
-      let bigEnd,
+      var bigEnd,
           tags, tag,
           exifData, gpsData,
           tiffOffset = start + 6;
@@ -658,7 +662,7 @@ crop.service('cropEXIF', [function() {
           return false;
       }
 
-      let firstIFDOffset = file.getUint32(tiffOffset+4, !bigEnd);
+      var firstIFDOffset = file.getUint32(tiffOffset+4, !bigEnd);
 
       if (firstIFDOffset < 0x00000008) {
           if (debug) console.log("Not valid TIFF data! (First offset less than 8)", file.getUint32(tiffOffset+4, !bigEnd));
@@ -744,7 +748,7 @@ crop.service('cropEXIF', [function() {
 
   this.getAllTags = function(img) {
       if (!imageHasData(img)) return {};
-      let a,
+      var a,
           data = img.exifdata,
           tags = {};
       for (a in data) {
@@ -757,7 +761,7 @@ crop.service('cropEXIF', [function() {
 
   this.pretty = function(img) {
       if (!imageHasData(img)) return "";
-      let a,
+      var a,
           data = img.exifdata,
           strPretty = "";
       for (a in data) {
