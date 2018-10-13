@@ -1,0 +1,47 @@
+{
+  "name": "ngimagecrop",
+  "version": "1.0.3",
+  "description": "Angular Ng Image Crop",
+  "main": "ngImageCrop.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Eduardo Castro",
+  "license": "ISC",
+  "peerDependencies": {
+    "angular": "^1.7.0"
+  },
+  "devDependencies": {
+    "angular-mocks": "^1.7.0",
+    "babel-core": "^6.26.3",
+    "babel-preset-es2015": "^6.24.1",
+    "gulp": "^3.9.1",
+    "gulp-babel": "^7.0.1",
+    "gulp-babel-minify": "^0.4.3",
+    "gulp-clean": "^0.4.0",
+    "gulp-concat": "^2.6.1",
+    "gulp-ng-html2js": "^0.2.2",
+    "gulp-rename": "^1.2.3",
+    "gulp-run-sequence": "^0.3.2",
+    "gulp-umd": "^2.0.0",
+    "gulp-watch": "^5.0.0",
+    "gulp-yarn": "^2.0.0",
+    "jasmine-core": "^3.1.0",
+    "jasmine-expect": "^3.8.3",
+    "karma": "^2.0.2",
+    "karma-babel-preprocessor": "^7.0.0",
+    "karma-coverage": "^1.1.2",
+    "karma-jasmine": "^1.1.2",
+    "karma-jasmine-matchers": "*",
+    "karma-mocha-reporter": "^2.2.5",
+    "karma-phantomjs-launcher": "^1.0.4",
+    "umd-templates": "0.0.3"
+  },
+  "dependencies": {
+    "angular": "^1.7.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/eduhrcastro/ngimagecropselect.git"
+  }
+}
