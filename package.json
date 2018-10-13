@@ -1,6 +1,6 @@
 {
   "name": "ngimagecrop",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Angular Ng Image Crop",
   "main": "ngImageCrop.js",
   "scripts": {

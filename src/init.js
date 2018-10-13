@@ -1,1 +1,2 @@
-let crop = angular.module('ngImgCrop', [])
+let NgImageCrop = 'ngImageCrop'
+let crop = angular.module('ngImageCrop', [])
